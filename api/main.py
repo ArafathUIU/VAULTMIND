@@ -1,7 +1,11 @@
 """FastAPI application entry point."""
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from api.routes.health import router as health_router
 from api.routes.query import router as query_router
@@ -29,14 +33,17 @@ def create_app() -> FastAPI:
     app.include_router(upload_router)
     app.include_router(query_router)
 
-    @app.get("/", tags=["root"])
-    def root() -> dict[str, str]:
-        return {
-            "name": settings.app_name,
-            "version": settings.app_version,
-            "docs": "/docs",
-            "health": "/health",
-        }
+    frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+    if frontend_dir.exists():
+        app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+
+    @app.get("/", tags=["root"], response_model=None)
+    def root():
+        index_file = frontend_dir / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+
+        return {"name": settings.app_name, "version": settings.app_version, "docs": "/docs"}
 
     return app
 

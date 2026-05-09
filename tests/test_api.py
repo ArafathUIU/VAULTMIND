@@ -46,7 +46,7 @@ def test_root_endpoint() -> None:
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json()["name"] == "VaultMind"
+    assert "VaultMind" in response.text
 
 
 def test_health_endpoint() -> None:
