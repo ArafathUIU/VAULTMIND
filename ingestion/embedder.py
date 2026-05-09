@@ -1,6 +1,7 @@
-"""Embedding provider integration for documents and queries."""
+"""Embedding provider integration for document chunks and queries."""
 
 import hashlib
+import logging
 import math
 
 from langchain_openai import OpenAIEmbeddings
@@ -8,9 +9,11 @@ from langchain_openai import OpenAIEmbeddings
 from core.config import EmbeddingProvider, settings
 from ingestion.models import DocumentChunk, EmbeddedChunk
 
+logger = logging.getLogger(__name__)
+
 
 class Embedder:
-    """Create embeddings for text and document chunks."""
+    """Create embeddings for text and VaultMind document chunks."""
 
     def __init__(
         self,
@@ -21,7 +24,7 @@ class Embedder:
         self.provider = provider or settings.embedding_provider
         self.model = model or settings.embedding_model
         self.dimensions = dimensions or settings.embedding_dimensions
-        self._client = None
+        self._client: OpenAIEmbeddings | None = None
 
     def embed_text(self, text: str) -> list[float]:
         """Embed a single text string."""
@@ -33,7 +36,11 @@ class Embedder:
         raise ValueError(f"Unsupported embedding provider: {self.provider}")
 
     def embed_chunks(self, chunks: list[DocumentChunk]) -> list[EmbeddedChunk]:
-        """Embed document chunks while preserving metadata."""
+        """Embed chunks while preserving their source metadata."""
+        if not chunks:
+            logger.warning("embed_chunks called with an empty chunk list")
+            return []
+
         return [EmbeddedChunk(chunk=chunk, embedding=self.embed_text(chunk.text)) for chunk in chunks]
 
     def _embed_openai(self, text: str) -> list[float]:
@@ -50,8 +57,21 @@ class Embedder:
         return self._client.embed_query(text)
 
 
+def embed_chunks(chunks: list[DocumentChunk]) -> list[EmbeddedChunk]:
+    """Embed chunks using configured settings."""
+    return Embedder().embed_chunks(chunks)
+
+
+def embed_query(query: str) -> list[float]:
+    """Embed a search query using configured settings."""
+    return Embedder().embed_text(query)
+
+
 def _embed_local(text: str, dimensions: int) -> list[float]:
     """Create a deterministic hashed bag-of-words embedding for local development."""
+    if dimensions <= 0:
+        raise ValueError("dimensions must be greater than 0")
+
     vector = [0.0] * dimensions
 
     for token in text.lower().split():
@@ -65,13 +85,3 @@ def _embed_local(text: str, dimensions: int) -> list[float]:
         return vector
 
     return [value / norm for value in vector]
-
-
-def embed_chunks(chunks: list[DocumentChunk]) -> list[EmbeddedChunk]:
-    """Embed chunks using configured settings."""
-    return Embedder().embed_chunks(chunks)
-
-
-def embed_query(query: str) -> list[float]:
-    """Embed a search query using configured settings."""
-    return Embedder().embed_text(query)
