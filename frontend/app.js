@@ -7,6 +7,7 @@ const uploadForm = document.querySelector("#uploadForm");
 const documentInput = document.querySelector("#documentInput");
 const fileLabel = document.querySelector("#fileLabel");
 const uploadStatus = document.querySelector("#uploadStatus");
+const clearButton = document.querySelector("#clearButton");
 const queryForm = document.querySelector("#queryForm");
 const queryInput = document.querySelector("#queryInput");
 const answerOutput = document.querySelector("#answerOutput");
@@ -71,6 +72,24 @@ uploadForm.addEventListener("submit", async (event) => {
     uploadStatus.textContent = error.message;
   } finally {
     uploadForm.querySelector("button").disabled = false;
+  }
+});
+
+clearButton.addEventListener("click", async () => {
+  clearButton.disabled = true;
+  uploadStatus.textContent = "Clearing index...";
+
+  try {
+    const result = await requestJson("/documents", { method: "DELETE" });
+    uploadStatus.textContent = result.message;
+    answerOutput.textContent = "Upload a document, then ask a question to start.";
+    verdictBadge.textContent = "Waiting";
+    traceOutput.innerHTML = "";
+    await refreshHealth();
+  } catch (error) {
+    uploadStatus.textContent = error.message;
+  } finally {
+    clearButton.disabled = false;
   }
 });
 

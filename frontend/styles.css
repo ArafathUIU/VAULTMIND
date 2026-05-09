@@ -54,6 +54,18 @@ button:disabled {
   opacity: 0.65;
 }
 
+.secondary-button {
+  margin-top: 0.75rem;
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+  border: 1px solid var(--line);
+}
+
+.secondary-button:hover {
+  box-shadow: 0 12px 28px rgba(99, 103, 255, 0.14);
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
