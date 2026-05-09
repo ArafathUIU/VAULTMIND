@@ -72,9 +72,9 @@ button:disabled {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
-  gap: 1.2rem;
-  width: min(1240px, calc(100% - 2rem));
+  grid-template-columns: minmax(380px, 0.86fr) minmax(460px, 1.14fr);
+  gap: 1.35rem;
+  width: min(1160px, calc(100% - 2rem));
   min-height: 100vh;
   margin: 0 auto;
   padding: 1rem 0;
@@ -85,10 +85,11 @@ button:disabled {
   top: 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: clamp(1.4rem, 3vh, 2.4rem);
   min-height: calc(100vh - 2rem);
   overflow: hidden;
-  padding: clamp(1.4rem, 3vw, 3rem);
+  padding: clamp(1.35rem, 2.45vw, 2.45rem);
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 2.2rem;
   background:
@@ -153,11 +154,12 @@ p {
 }
 
 h1 {
-  max-width: 10ch;
+  max-width: 7.2ch;
   margin-bottom: 0;
-  font-size: clamp(3.2rem, 7vw, 7rem);
-  line-height: 0.84;
-  letter-spacing: -0.08em;
+  font-size: clamp(3.2rem, 5.8vw, 5.95rem);
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+  text-wrap: balance;
 }
 
 h2 {
@@ -169,10 +171,10 @@ h2 {
 .hero-copy {
   position: relative;
   z-index: 1;
-  max-width: 34rem;
+  max-width: 28rem;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 1.1rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 .agent-strip,
@@ -203,9 +205,9 @@ h2 {
 
 .status-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
-  margin-top: 2rem;
+  margin-top: auto;
 }
 
 .status-grid article,
@@ -217,7 +219,7 @@ h2 {
 }
 
 .status-grid article {
-  padding: 1rem;
+  padding: 0.9rem;
   border-radius: 1.2rem;
 }
 
