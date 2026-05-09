@@ -59,9 +59,9 @@ class Settings(BaseSettings):
     groq_fast_model: str = "llama-3.1-8b-instant"
 
     # ── Embeddings ────────────────────────────────────────
-    embedding_provider: EmbeddingProvider = EmbeddingProvider.OPENAI
-    embedding_model: str = "text-embedding-3-small"
-    embedding_dimensions: int = 1536
+    embedding_provider: EmbeddingProvider = EmbeddingProvider.LOCAL
+    embedding_model: str = "local-hash-embedding"
+    embedding_dimensions: int = 384
 
     # ── Vector Store ──────────────────────────────────────
     vector_store_type: VectorStoreType = VectorStoreType.FAISS
