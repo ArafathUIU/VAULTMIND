@@ -43,5 +43,7 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     vector_store_ready: bool
+    vector_count: int = 0
+    source_count: int = 0
     llm_provider: str
     environment: str
