@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="VaultMind icon">
+  <defs>
+    <linearGradient id="g" x1="16" x2="112" y1="16" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6367FF" />
+      <stop offset="0.55" stop-color="#8494FF" />
+      <stop offset="1" stop-color="#FFDBFD" />
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#6367FF" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="32" fill="#101226" />
+  <path filter="url(#s)" fill="url(#g)" d="M64 18 100 32v31c0 24-14.5 39.5-36 47-21.5-7.5-36-23-36-47V32l36-14Z" />
+  <path fill="#fff" fill-opacity="0.95" d="M43 50h13l8 24 8-24h13L71 86H57L43 50Z" />
+  <circle cx="64" cy="42" r="7" fill="#FFDBFD" />
+</svg>

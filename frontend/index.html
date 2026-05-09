@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VaultMind | Agentic Document Intelligence</title>
+    <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +17,9 @@
     <main class="app-shell">
       <section class="hero-panel">
         <nav class="nav-bar">
-          <div class="brand-mark">VM</div>
+          <div class="brand-mark" aria-hidden="true">
+            <img src="/static/icon.svg" alt="" />
+          </div>
           <div>
             <p class="eyebrow">VaultMind</p>
             <h1>Agentic document intelligence for serious answers.</h1>
@@ -29,10 +32,10 @@
         </p>
 
         <div class="agent-strip" aria-label="Agent workflow">
-          <span>Router</span>
-          <span>Retriever</span>
-          <span>Reasoner</span>
-          <span>Critic</span>
+          <span><strong>01</strong> Router</span>
+          <span><strong>02</strong> Retriever</span>
+          <span><strong>03</strong> Reasoner</span>
+          <span><strong>04</strong> Critic</span>
         </div>
 
         <div class="status-grid">
@@ -61,49 +64,79 @@
 
       <section class="workspace-panel">
         <div class="card upload-card">
-          <div>
-            <p class="eyebrow">Step 1</p>
-            <h2>Upload a document</h2>
-            <p>PDF, DOCX, TXT, and Markdown are supported.</p>
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Knowledge Vault</p>
+              <h2>Load your source material</h2>
+              <p>PDF, DOCX, TXT, and Markdown are supported.</p>
+            </div>
+            <span class="step-badge">01</span>
           </div>
           <form id="uploadForm" class="upload-form">
             <label class="drop-zone" for="documentInput">
               <input id="documentInput" name="file" type="file" accept=".pdf,.docx,.txt,.md" />
+              <span class="drop-icon">+</span>
               <span id="fileLabel">Choose or drop a document</span>
+              <small>Text is chunked, embedded, and indexed locally.</small>
             </label>
-            <button type="submit">Index Document</button>
+            <div class="action-row">
+              <button type="submit">Index Document</button>
+              <button id="clearButton" class="secondary-button" type="button">Clear Index</button>
+            </div>
           </form>
-          <button id="clearButton" class="secondary-button" type="button">Clear Index</button>
           <p id="uploadStatus" class="status-line"></p>
         </div>
 
         <div class="card query-card">
-          <div>
-            <p class="eyebrow">Step 2</p>
-            <h2>Ask your document</h2>
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Agent Workspace</p>
+              <h2>Ask with confidence</h2>
+            </div>
+            <span class="step-badge">02</span>
           </div>
           <form id="queryForm" class="query-form">
-            <textarea
-              id="queryInput"
-              name="query"
-              rows="4"
-              placeholder="Example: What does the document say about annual leave?"
-            ></textarea>
+            <div class="composer">
+              <textarea
+                id="queryInput"
+                name="query"
+                rows="4"
+                placeholder="Ask a precise question about the indexed document..."
+              ></textarea>
+              <button class="composer-submit" type="submit">Ask VaultMind</button>
+            </div>
             <div class="sample-questions" aria-label="Sample questions">
               <button type="button" data-query="Summarize the uploaded document.">Summarize</button>
               <button type="button" data-query="What are the key obligations?">Obligations</button>
               <button type="button" data-query="What does it say about termination?">Termination</button>
             </div>
-            <button type="submit">Run Agent Pipeline</button>
           </form>
-          <article class="answer-box">
+          <article class="answer-box is-idle" id="answerBox">
             <div class="answer-header">
-              <span>Verified answer</span>
+              <span class="answer-title">Verified answer</span>
               <strong id="verdictBadge">Waiting</strong>
             </div>
-            <p id="answerOutput">Upload a document, then ask a question to start.</p>
+            <div id="answerOutput" class="answer-output">
+              <p>Upload a document, then ask a question to start.</p>
+            </div>
+            <dl class="answer-meta">
+              <div>
+                <dt>Reformulated query</dt>
+                <dd id="reformulatedOutput">-</dd>
+              </div>
+              <div>
+                <dt>Chunks used</dt>
+                <dd id="chunkCountOutput">0</dd>
+              </div>
+            </dl>
           </article>
-          <div id="traceOutput" class="trace-output"></div>
+          <section class="trace-card">
+            <div class="trace-heading">
+              <span>Agent trace</span>
+              <small>Router to critic</small>
+            </div>
+            <div id="traceOutput" class="trace-output"></div>
+          </section>
         </div>
       </section>
     </main>

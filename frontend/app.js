@@ -10,8 +10,11 @@ const uploadStatus = document.querySelector("#uploadStatus");
 const clearButton = document.querySelector("#clearButton");
 const queryForm = document.querySelector("#queryForm");
 const queryInput = document.querySelector("#queryInput");
+const answerBox = document.querySelector("#answerBox");
 const answerOutput = document.querySelector("#answerOutput");
 const verdictBadge = document.querySelector("#verdictBadge");
+const reformulatedOutput = document.querySelector("#reformulatedOutput");
+const chunkCountOutput = document.querySelector("#chunkCountOutput");
 const traceOutput = document.querySelector("#traceOutput");
 const sampleButtons = document.querySelectorAll("[data-query]");
 
@@ -90,8 +93,10 @@ clearButton.addEventListener("click", async () => {
   try {
     const result = await requestJson("/documents", { method: "DELETE" });
     uploadStatus.textContent = result.message;
-    answerOutput.textContent = "Upload a document, then ask a question to start.";
+    setAnswer("Upload a document, then ask a question to start.");
     verdictBadge.textContent = "Waiting";
+    reformulatedOutput.textContent = "-";
+    chunkCountOutput.textContent = "0";
     traceOutput.innerHTML = "";
     await refreshHealth();
   } catch (error) {
@@ -106,12 +111,16 @@ queryForm.addEventListener("submit", async (event) => {
   const query = queryInput.value.trim();
 
   if (!query) {
-    answerOutput.textContent = "Ask a question first.";
+    setAnswer("Ask a question first.");
     return;
   }
 
-  answerOutput.textContent = "Agents are working...";
+  answerBox.classList.add("is-running");
+  answerBox.classList.remove("is-idle");
+  setAnswer("VaultMind is routing your question, retrieving context, and checking the answer...");
   verdictBadge.textContent = "Running";
+  reformulatedOutput.textContent = "-";
+  chunkCountOutput.textContent = "0";
   traceOutput.innerHTML = "";
   queryForm.querySelector("button").disabled = true;
 
@@ -121,16 +130,48 @@ queryForm.addEventListener("submit", async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query }),
     });
-    answerOutput.textContent = result.final_answer;
+    setAnswer(result.final_answer);
     verdictBadge.textContent = result.verdict || "Done";
+    reformulatedOutput.textContent = result.reformulated_query || "-";
+    chunkCountOutput.textContent = result.chunk_count ?? 0;
     renderTrace(result.agent_logs || []);
   } catch (error) {
-    answerOutput.textContent = error.message;
+    setAnswer(error.message);
     verdictBadge.textContent = "Error";
   } finally {
+    answerBox.classList.remove("is-running");
     queryForm.querySelector("button").disabled = false;
   }
 });
+
+function setAnswer(text) {
+  answerOutput.innerHTML = formatAnswer(text || "No answer returned.");
+}
+
+function formatAnswer(text) {
+  const escaped = escapeHtml(text);
+  const lines = escaped.split("\n").map((line) => line.trim()).filter(Boolean);
+
+  if (!lines.length) {
+    return "<p>No answer returned.</p>";
+  }
+
+  const bulletLines = lines.filter((line) => line.startsWith("-") || line.startsWith("*"));
+  if (bulletLines.length === lines.length) {
+    return `<ul>${bulletLines.map((line) => `<li>${line.replace(/^[-*]\s*/, "")}</li>`).join("")}</ul>`;
+  }
+
+  return lines.map((line) => `<p>${line}</p>`).join("");
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function renderTrace(logs) {
   traceOutput.innerHTML = "";
@@ -143,9 +184,10 @@ function renderTrace(logs) {
     const pill = document.createElement("div");
     pill.className = "trace-pill";
     const latency = log.latency_ms ? `${log.latency_ms}ms` : log.skipped ? "skipped" : "complete";
-    pill.innerHTML = `<span>${log.agent}</span><strong>${latency}</strong>`;
+    pill.innerHTML = `<span class="trace-dot"></span><span>${log.agent}</span><strong>${latency}</strong>`;
     traceOutput.appendChild(pill);
   }
 }
 
+setAnswer("Upload a document, then ask a question to start.");
 refreshHealth();
