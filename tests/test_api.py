@@ -1,5 +1,11 @@
 """Tests for FastAPI endpoints."""
 
+from fastapi.testclient import TestClient
+
+from api.dependencies import get_vector_store
+from api.main import app
+from ingestion.vector_store import VaultVectorStore
+
 
 def test_api_modules_import() -> None:
     """Verify API scaffold modules are importable."""
@@ -11,3 +17,42 @@ def test_api_modules_import() -> None:
     import api.schemas
 
     assert api.main is not None
+
+
+def test_root_endpoint() -> None:
+    client = TestClient(app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "VaultMind"
+
+
+def test_health_endpoint() -> None:
+    client = TestClient(app)
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    assert "vector_store_ready" in response.json()
+
+
+def test_upload_endpoint_indexes_text_document() -> None:
+    vector_store = VaultVectorStore()
+
+    app.dependency_overrides[get_vector_store] = lambda: vector_store
+    client = TestClient(app)
+
+    try:
+        response = client.post(
+            "/documents/upload",
+            files={"file": ("policy.txt", b"annual leave vacation policy", "text/plain")},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 201
+    assert response.json()["file_name"] == "policy.txt"
+    assert response.json()["total_chunks"] == 1
+    assert vector_store.is_ready is True
