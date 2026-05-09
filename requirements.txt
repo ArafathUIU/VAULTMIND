@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+langchain
+langgraph
+langchain-openai
+langchain-google-genai
+langchain-anthropic
+langchain-groq
+faiss-cpu
+pinecone
+pytest

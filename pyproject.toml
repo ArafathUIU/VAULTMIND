@@ -1,0 +1,9 @@
+[project]
+name = "vaultmind"
+version = "0.1.0"
+description = "Agentic document intelligence platform"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

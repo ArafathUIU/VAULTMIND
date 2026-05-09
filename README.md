@@ -21,7 +21,7 @@ User Query → Router Agent → Retriever Agent → Reasoning Agent → Critic A
 - Multi-agent orchestration with LangGraph
 - PDF / DOCX / TXT ingestion with semantic chunking
 - Vector search via FAISS (local) or Pinecone (cloud)
-- Multi-LLM support: OpenAI, Gemini, Anthropic
+- Multi-LLM support: Groq, OpenAI, Gemini, Anthropic
 - Streaming responses via FastAPI
 - Hallucination checking via critic agent
 - Full observability: latency, token cost, agent traces (LangSmith)
@@ -47,7 +47,7 @@ Docs at http://localhost:8000/docs
 | Layer         | Stack                              |
 |---------------|------------------------------------|
 | Agents        | LangGraph, LangChain               |
-| LLMs          | OpenAI, Gemini, Anthropic          |
+| LLMs          | Groq, OpenAI, Gemini, Anthropic    |
 | Vector DB     | FAISS (local), Pinecone (cloud)    |
 | Backend       | FastAPI, Python 3.11               |
 | Observability | LangSmith, custom metrics          |
