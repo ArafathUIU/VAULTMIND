@@ -245,6 +245,21 @@ h2 {
   margin-top: 1.2rem;
 }
 
+.sample-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sample-questions button {
+  padding: 0.55rem 0.8rem;
+  color: var(--primary);
+  background: rgba(201, 190, 255, 0.24);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  font-size: 0.82rem;
+}
+
 .drop-zone {
   display: grid;
   min-height: 7.5rem;

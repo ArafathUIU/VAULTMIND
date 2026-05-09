@@ -13,6 +13,7 @@ const queryInput = document.querySelector("#queryInput");
 const answerOutput = document.querySelector("#answerOutput");
 const verdictBadge = document.querySelector("#verdictBadge");
 const traceOutput = document.querySelector("#traceOutput");
+const sampleButtons = document.querySelectorAll("[data-query]");
 
 async function requestJson(url, options = {}) {
   const response = await fetch(url, options);
@@ -45,6 +46,13 @@ async function refreshHealth() {
 documentInput.addEventListener("change", () => {
   const file = documentInput.files[0];
   fileLabel.textContent = file ? file.name : "Choose or drop a document";
+});
+
+sampleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    queryInput.value = button.dataset.query;
+    queryInput.focus();
+  });
 });
 
 uploadForm.addEventListener("submit", async (event) => {
