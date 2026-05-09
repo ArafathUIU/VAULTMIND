@@ -2,9 +2,28 @@
 
 from fastapi.testclient import TestClient
 
-from api.dependencies import get_vector_store
+from api.dependencies import get_orchestrator, get_vector_store
 from api.main import app
 from ingestion.vector_store import VaultVectorStore
+
+
+class FakePipelineResult:
+    query = "What is the leave policy?"
+    final_answer = "Employees receive annual leave."
+    verdict = "PASS"
+    was_revised = False
+    reformulated_query = "leave policy"
+    chunk_count = 1
+    agent_logs = [{"agent": "fake"}]
+    success = True
+    error = None
+
+
+class FakeOrchestrator:
+    def run(self, query: str) -> FakePipelineResult:
+        result = FakePipelineResult()
+        result.query = query
+        return result
 
 
 def test_api_modules_import() -> None:
@@ -56,3 +75,20 @@ def test_upload_endpoint_indexes_text_document() -> None:
     assert response.json()["file_name"] == "policy.txt"
     assert response.json()["total_chunks"] == 1
     assert vector_store.is_ready is True
+
+
+def test_query_endpoint_returns_orchestrator_result() -> None:
+    app.dependency_overrides[get_orchestrator] = lambda: FakeOrchestrator()
+    client = TestClient(app)
+
+    try:
+        response = client.post("/query", json={"query": "What is the leave policy?"})
+    finally:
+        app.dependency_overrides.clear()
+
+    payload = response.json()
+
+    assert response.status_code == 200
+    assert payload["final_answer"] == "Employees receive annual leave."
+    assert payload["verdict"] == "PASS"
+    assert payload["agent_logs"] == [{"agent": "fake"}]
