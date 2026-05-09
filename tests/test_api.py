@@ -1,9 +1,11 @@
 """Tests for FastAPI endpoints."""
 
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from api.dependencies import get_orchestrator, get_vector_store
 from api.main import app
+from api.schemas import QueryRequest, QueryResponse
 from ingestion.vector_store import VaultVectorStore
 
 
@@ -92,3 +94,19 @@ def test_query_endpoint_returns_orchestrator_result() -> None:
     assert payload["final_answer"] == "Employees receive annual leave."
     assert payload["verdict"] == "PASS"
     assert payload["agent_logs"] == [{"agent": "fake"}]
+
+
+def test_query_request_rejects_empty_query() -> None:
+    try:
+        QueryRequest(query="")
+    except ValidationError as exc:
+        assert "String should have at least 1 character" in str(exc)
+    else:
+        raise AssertionError("Expected validation error for empty query")
+
+
+def test_query_response_defaults_agent_logs() -> None:
+    response = QueryResponse(query="q", final_answer="a")
+
+    assert response.agent_logs == []
+    assert response.success is True
