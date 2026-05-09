@@ -5,7 +5,7 @@ VaultMind is a multi-agent AI system that lets you upload documents and query th
 
 Built as a production-grade showcase of modern AI engineering: RAG pipelines, agentic workflows, LLM evaluation, and AI Ops.
 
-![VaultMind UI preview](docs/vaultmind-ui-preview.svg)
+![VaultMind UI preview](docs/VM.png)
 
 ---
 
