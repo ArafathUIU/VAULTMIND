@@ -79,6 +79,26 @@ def test_upload_endpoint_indexes_text_document() -> None:
     assert vector_store.is_ready is True
 
 
+def test_clear_documents_endpoint_resets_store() -> None:
+    vector_store = VaultVectorStore()
+
+    app.dependency_overrides[get_vector_store] = lambda: vector_store
+    client = TestClient(app)
+
+    try:
+        client.post(
+            "/documents/upload",
+            files={"file": ("policy.txt", b"annual leave vacation policy", "text/plain")},
+        )
+        response = client.delete("/documents")
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    assert vector_store.is_ready is False
+
+
 def test_query_endpoint_returns_orchestrator_result() -> None:
     app.dependency_overrides[get_orchestrator] = lambda: FakeOrchestrator()
     client = TestClient(app)

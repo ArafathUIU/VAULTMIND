@@ -15,6 +15,11 @@ class UploadResponse(BaseModel):
     success: bool
 
 
+class StoreResetResponse(BaseModel):
+    message: str
+    success: bool
+
+
 # ─────────────────────────────────────────────
 # QUERY
 # ─────────────────────────────────────────────

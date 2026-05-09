@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from api.dependencies import get_vector_store
-from api.schemas import UploadResponse
+from api.schemas import StoreResetResponse, UploadResponse
 from core.config import settings
 from ingestion.chunker import chunk_document
 from ingestion.embedder import Embedder
@@ -59,3 +59,10 @@ def upload_document(
         total_chunks=len(chunks),
         success=True,
     )
+
+
+@router.delete("", response_model=StoreResetResponse)
+def clear_documents(vector_store: VaultVectorStore = Depends(get_vector_store)) -> StoreResetResponse:
+    """Clear the in-memory document index."""
+    vector_store.clear()
+    return StoreResetResponse(message="Document index cleared.", success=True)
