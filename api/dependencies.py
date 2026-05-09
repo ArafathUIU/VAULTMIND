@@ -3,6 +3,8 @@
 import logging
 from functools import lru_cache
 
+from fastapi import HTTPException, status
+
 from ingestion.vector_store import VaultVectorStore
 from agents.orchestrator import VaultOrchestrator
 
@@ -33,4 +35,10 @@ def get_orchestrator() -> VaultOrchestrator:
     Agents are initialised once and reused.
     """
     vector_store = get_vector_store()
-    return VaultOrchestrator(vector_store=vector_store)
+    try:
+        return VaultOrchestrator(vector_store=vector_store)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
