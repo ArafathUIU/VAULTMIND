@@ -125,3 +125,20 @@ def test_vector_store_returns_most_relevant_chunk(tmp_path: Path) -> None:
 
     assert len(store) == 2
     assert results[0].chunk.text == "annual leave vacation entitlement"
+
+
+def test_vector_store_stats_and_clear(tmp_path: Path) -> None:
+    file_path = tmp_path / "handbook.txt"
+    file_path.write_text("annual leave vacation entitlement", encoding="utf-8")
+    document = load_document(file_path)
+    chunks = chunk_document(document, chunk_size=4, chunk_overlap=0)
+    embedder = Embedder(provider=EmbeddingProvider.LOCAL, dimensions=64)
+    store = InMemoryVectorStore(embedder=embedder)
+
+    store.add(embedder.embed_chunks(chunks))
+
+    assert store.stats() == {"is_ready": True, "vector_count": 1, "source_count": 1}
+
+    store.clear()
+
+    assert store.stats() == {"is_ready": False, "vector_count": 0, "source_count": 0}

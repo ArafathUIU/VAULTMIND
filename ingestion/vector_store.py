@@ -22,6 +22,19 @@ class InMemoryVectorStore:
         """Store embedded chunks."""
         self._items.extend(embedded_chunks)
 
+    def clear(self) -> None:
+        """Remove all vectors from the store."""
+        self._items.clear()
+
+    def stats(self) -> dict[str, int | bool]:
+        """Return lightweight store statistics."""
+        sources = {item.chunk.source for item in self._items}
+        return {
+            "is_ready": self.is_ready,
+            "vector_count": len(self._items),
+            "source_count": len(sources),
+        }
+
     def search(self, query: str, top_k: int = 5) -> list[SearchResult]:
         """Return the most similar chunks for a query."""
         if top_k <= 0:
