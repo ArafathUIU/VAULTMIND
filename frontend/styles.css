@@ -72,9 +72,9 @@ button:disabled {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(380px, 0.86fr) minmax(460px, 1.14fr);
-  gap: 1.35rem;
-  width: min(1160px, calc(100% - 2rem));
+  grid-template-columns: minmax(360px, 0.72fr) minmax(620px, 1.28fr);
+  gap: 1rem;
+  width: min(100% - 2rem, 1680px);
   min-height: 100vh;
   margin: 0 auto;
   padding: 1rem 0;
@@ -89,7 +89,7 @@ button:disabled {
   gap: clamp(1.4rem, 3vh, 2.4rem);
   min-height: calc(100vh - 2rem);
   overflow: hidden;
-  padding: clamp(1.35rem, 2.45vw, 2.45rem);
+  padding: clamp(1.25rem, 2vw, 2.2rem);
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 2.2rem;
   background:
@@ -154,9 +154,9 @@ p {
 }
 
 h1 {
-  max-width: 7.2ch;
+  max-width: 6.9ch;
   margin-bottom: 0;
-  font-size: clamp(3.2rem, 5.8vw, 5.95rem);
+  font-size: clamp(3rem, 4.8vw, 5.5rem);
   line-height: 0.88;
   letter-spacing: -0.075em;
   text-wrap: balance;
@@ -171,7 +171,7 @@ h2 {
 .hero-copy {
   position: relative;
   z-index: 1;
-  max-width: 28rem;
+  max-width: 30rem;
   color: rgba(255, 255, 255, 0.76);
   font-size: 1rem;
   line-height: 1.65;
@@ -237,7 +237,12 @@ h2 {
 .workspace-panel {
   display: grid;
   gap: 1rem;
-  align-content: center;
+  align-content: start;
+  grid-template-rows: auto 1fr;
+}
+
+.query-card {
+  display: grid;
 }
 
 .card,
@@ -390,6 +395,62 @@ textarea {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
+.chat-history {
+  display: grid;
+  gap: 0.9rem;
+  max-height: min(42vh, 470px);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scroll-behavior: smooth;
+}
+
+.message {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.message-avatar {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.85rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--blue-soft));
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.user-message .message-avatar {
+  color: var(--primary);
+  background: rgba(201, 190, 255, 0.35);
+}
+
+.message-content {
+  min-width: 0;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem 1rem 1rem 0.35rem;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.user-message .message-content {
+  border-radius: 1rem 1rem 0.35rem 1rem;
+  background: rgba(201, 190, 255, 0.2);
+}
+
+.message-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .answer-box.is-running {
   animation: pulse-border 1.2s ease-in-out infinite;
 }
@@ -429,8 +490,8 @@ textarea {
 
 .answer-output {
   color: var(--ink);
-  font-size: 1.02rem;
-  line-height: 1.75;
+  font-size: 0.98rem;
+  line-height: 1.68;
 }
 
 .answer-output p,
@@ -525,6 +586,7 @@ textarea {
 @media (max-width: 900px) {
   .app-shell {
     grid-template-columns: 1fr;
+    width: min(100% - 1rem, 860px);
   }
 
   .hero-panel {

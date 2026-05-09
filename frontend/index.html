@@ -113,11 +113,19 @@
           </form>
           <article class="answer-box is-idle" id="answerBox">
             <div class="answer-header">
-              <span class="answer-title">Verified answer</span>
+              <span class="answer-title">Conversation</span>
               <strong id="verdictBadge">Waiting</strong>
             </div>
-            <div id="answerOutput" class="answer-output">
-              <p>Upload a document, then ask a question to start.</p>
+            <div id="chatHistory" class="chat-history" aria-live="polite">
+              <div class="message assistant-message">
+                <div class="message-avatar">VM</div>
+                <div class="message-content">
+                  <span class="message-label">VaultMind</span>
+                  <div id="answerOutput" class="answer-output">
+                    <p>Upload a document, then ask as many questions as you want. Your conversation will stay here.</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <dl class="answer-meta">
               <div>

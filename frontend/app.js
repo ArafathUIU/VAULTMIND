@@ -11,6 +11,7 @@ const clearButton = document.querySelector("#clearButton");
 const queryForm = document.querySelector("#queryForm");
 const queryInput = document.querySelector("#queryInput");
 const answerBox = document.querySelector("#answerBox");
+const chatHistory = document.querySelector("#chatHistory");
 const answerOutput = document.querySelector("#answerOutput");
 const verdictBadge = document.querySelector("#verdictBadge");
 const reformulatedOutput = document.querySelector("#reformulatedOutput");
@@ -93,7 +94,7 @@ clearButton.addEventListener("click", async () => {
   try {
     const result = await requestJson("/documents", { method: "DELETE" });
     uploadStatus.textContent = result.message;
-    setAnswer("Upload a document, then ask a question to start.");
+    resetChat();
     verdictBadge.textContent = "Waiting";
     reformulatedOutput.textContent = "-";
     chunkCountOutput.textContent = "0";
@@ -117,7 +118,13 @@ queryForm.addEventListener("submit", async (event) => {
 
   answerBox.classList.add("is-running");
   answerBox.classList.remove("is-idle");
-  setAnswer("VaultMind is routing your question, retrieving context, and checking the answer...");
+  appendMessage("user", "You", query);
+  queryInput.value = "";
+  const pendingMessage = appendMessage(
+    "assistant",
+    "VaultMind",
+    "VaultMind is routing your question, retrieving context, and checking the answer..."
+  );
   verdictBadge.textContent = "Running";
   reformulatedOutput.textContent = "-";
   chunkCountOutput.textContent = "0";
@@ -130,13 +137,13 @@ queryForm.addEventListener("submit", async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query }),
     });
-    setAnswer(result.final_answer);
+    updateMessage(pendingMessage, result.final_answer);
     verdictBadge.textContent = result.verdict || "Done";
     reformulatedOutput.textContent = result.reformulated_query || "-";
     chunkCountOutput.textContent = result.chunk_count ?? 0;
     renderTrace(result.agent_logs || []);
   } catch (error) {
-    setAnswer(error.message);
+    updateMessage(pendingMessage, error.message);
     verdictBadge.textContent = "Error";
   } finally {
     answerBox.classList.remove("is-running");
@@ -145,7 +152,48 @@ queryForm.addEventListener("submit", async (event) => {
 });
 
 function setAnswer(text) {
-  answerOutput.innerHTML = formatAnswer(text || "No answer returned.");
+  const currentAnswerOutput = document.querySelector("#answerOutput");
+  if (currentAnswerOutput) {
+    currentAnswerOutput.innerHTML = formatAnswer(text || "No answer returned.");
+    return;
+  }
+
+  appendMessage("assistant", "VaultMind", text || "No answer returned.");
+}
+
+function resetChat() {
+  chatHistory.innerHTML = `
+    <div class="message assistant-message">
+      <div class="message-avatar">VM</div>
+      <div class="message-content">
+        <span class="message-label">VaultMind</span>
+        <div id="answerOutput" class="answer-output">
+          ${formatAnswer("Upload a document, then ask as many questions as you want. Your conversation will stay here.")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function appendMessage(role, label, text) {
+  const message = document.createElement("div");
+  message.className = `message ${role === "user" ? "user-message" : "assistant-message"}`;
+  message.innerHTML = `
+    <div class="message-avatar">${role === "user" ? "You" : "VM"}</div>
+    <div class="message-content">
+      <span class="message-label">${escapeHtml(label)}</span>
+      <div class="answer-output">${formatAnswer(text)}</div>
+    </div>
+  `;
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  return message;
+}
+
+function updateMessage(message, text) {
+  const output = message.querySelector(".answer-output");
+  output.innerHTML = formatAnswer(text || "No answer returned.");
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 function formatAnswer(text) {
@@ -189,5 +237,4 @@ function renderTrace(logs) {
   }
 }
 
-setAnswer("Upload a document, then ask a question to start.");
 refreshHealth();
