@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VaultMind | Agentic Document Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel">
+        <nav class="nav-bar">
+          <div class="brand-mark">VM</div>
+          <div>
+            <p class="eyebrow">VaultMind</p>
+            <h1>Agentic document intelligence for serious answers.</h1>
+          </div>
+        </nav>
+
+        <p class="hero-copy">
+          Upload policy files, reports, contracts, or notes. VaultMind routes, retrieves,
+          reasons, and critiques every answer before it reaches you.
+        </p>
+
+        <div class="agent-strip" aria-label="Agent workflow">
+          <span>Router</span>
+          <span>Retriever</span>
+          <span>Reasoner</span>
+          <span>Critic</span>
+        </div>
+
+        <div class="status-grid">
+          <article>
+            <strong id="healthStatus">Checking</strong>
+            <span>API status</span>
+          </article>
+          <article>
+            <strong id="storeStatus">Unknown</strong>
+            <span>Vector store</span>
+          </article>
+          <article>
+            <strong id="providerStatus">-</strong>
+            <span>LLM provider</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="workspace-panel">
+        <div class="card upload-card">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2>Upload a document</h2>
+            <p>PDF, DOCX, TXT, and Markdown are supported.</p>
+          </div>
+          <form id="uploadForm" class="upload-form">
+            <label class="drop-zone" for="documentInput">
+              <input id="documentInput" name="file" type="file" accept=".pdf,.docx,.txt,.md" />
+              <span id="fileLabel">Choose or drop a document</span>
+            </label>
+            <button type="submit">Index Document</button>
+          </form>
+          <p id="uploadStatus" class="status-line"></p>
+        </div>
+
+        <div class="card query-card">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2>Ask your document</h2>
+          </div>
+          <form id="queryForm" class="query-form">
+            <textarea
+              id="queryInput"
+              name="query"
+              rows="4"
+              placeholder="Example: What does the document say about annual leave?"
+            ></textarea>
+            <button type="submit">Run Agent Pipeline</button>
+          </form>
+          <article class="answer-box">
+            <div class="answer-header">
+              <span>Verified answer</span>
+              <strong id="verdictBadge">Waiting</strong>
+            </div>
+            <p id="answerOutput">Upload a document, then ask a question to start.</p>
+          </article>
+          <div id="traceOutput" class="trace-output"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
