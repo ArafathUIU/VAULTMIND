@@ -13,4 +13,5 @@ faiss-cpu
 pinecone
 pypdf
 python-docx
+python-multipart
 pytest
