@@ -243,6 +243,8 @@ h2 {
 
 .query-card {
   display: grid;
+  grid-template-rows: auto minmax(260px, 1fr) auto auto;
+  gap: 0.9rem;
 }
 
 .card,
@@ -282,6 +284,11 @@ h2 {
   display: grid;
   gap: 0.85rem;
   margin-top: 1.2rem;
+}
+
+.chat-composer-form {
+  align-self: end;
+  margin-top: 0;
 }
 
 .drop-zone {
@@ -342,7 +349,7 @@ h2 {
 
 textarea {
   width: 100%;
-  min-height: 7rem;
+  min-height: 5.4rem;
   resize: vertical;
   border: 0;
   padding: 0.65rem;
@@ -385,7 +392,10 @@ textarea {
 }
 
 .answer-box {
-  margin-top: 1rem;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 320px;
+  margin-top: 0;
   padding: 1.1rem;
   border: 1px solid var(--line);
   border-radius: 1.35rem;
@@ -398,7 +408,7 @@ textarea {
 .chat-history {
   display: grid;
   gap: 0.9rem;
-  max-height: min(42vh, 470px);
+  max-height: min(46vh, 560px);
   overflow-y: auto;
   padding-right: 0.25rem;
   scroll-behavior: smooth;
@@ -409,6 +419,27 @@ textarea {
   grid-template-columns: 2.25rem minmax(0, 1fr);
   gap: 0.7rem;
   align-items: start;
+}
+
+.user-message {
+  grid-template-columns: minmax(0, 1fr) 2.25rem;
+  justify-self: end;
+  width: min(88%, 720px);
+}
+
+.assistant-message {
+  justify-self: start;
+  width: min(92%, 780px);
+}
+
+.user-message .message-avatar {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.user-message .message-content {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .message-avatar {
@@ -438,7 +469,14 @@ textarea {
 
 .user-message .message-content {
   border-radius: 1rem 1rem 0.35rem 1rem;
-  background: rgba(201, 190, 255, 0.2);
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--blue-soft));
+  box-shadow: 0 16px 34px rgba(99, 103, 255, 0.2);
+}
+
+.user-message .message-label,
+.user-message .answer-output {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .message-label {
