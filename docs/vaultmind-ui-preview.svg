@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-label="VaultMind UI preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFDBFD" />
+      <stop offset="0.5" stop-color="#F4F2FF" />
+      <stop offset="1" stop-color="#8494FF" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#101226" />
+      <stop offset="1" stop-color="#30336F" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#6367FF" />
+      <stop offset="0.7" stop-color="#8494FF" />
+      <stop offset="1" stop-color="#FFDBFD" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="24" stdDeviation="26" flood-color="#363982" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <rect width="1280" height="760" fill="url(#bg)" />
+  <g opacity="0.14" stroke="#6367FF" stroke-width="1">
+    <path d="M0 80H1280M0 160H1280M0 240H1280M0 320H1280M0 400H1280M0 480H1280M0 560H1280M0 640H1280" />
+    <path d="M80 0V760M160 0V760M240 0V760M320 0V760M400 0V760M480 0V760M560 0V760M640 0V760M720 0V760M800 0V760M880 0V760M960 0V760M1040 0V760M1120 0V760M1200 0V760" />
+  </g>
+
+  <rect x="86" y="42" width="430" height="676" rx="34" fill="url(#panel)" filter="url(#shadow)" />
+  <rect x="122" y="82" width="54" height="54" rx="16" fill="#ffffff" opacity="0.1" />
+  <rect x="135" y="95" width="28" height="28" rx="8" fill="url(#accent)" />
+  <text x="192" y="110" fill="#FFDBFD" font-family="Inter, Arial" font-size="14" font-weight="800" letter-spacing="2">VAULTMIND</text>
+  <text x="122" y="206" fill="#FFFFFF" font-family="Inter, Arial" font-size="74" font-weight="900">Agentic</text>
+  <text x="122" y="278" fill="#FFFFFF" font-family="Inter, Arial" font-size="74" font-weight="900">document</text>
+  <text x="122" y="350" fill="#FFFFFF" font-family="Inter, Arial" font-size="74" font-weight="900">intelligence</text>
+  <text x="122" y="422" fill="#FFFFFF" font-family="Inter, Arial" font-size="74" font-weight="900">for answers.</text>
+  <text x="124" y="474" fill="#DADCF8" font-family="Inter, Arial" font-size="18">Upload files, ask questions, and get</text>
+  <text x="124" y="502" fill="#DADCF8" font-family="Inter, Arial" font-size="18">critic-checked answers with traces.</text>
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.2">
+    <rect x="124" y="546" width="330" height="42" rx="21" />
+    <rect x="124" y="600" width="330" height="42" rx="21" />
+    <rect x="124" y="654" width="330" height="42" rx="21" />
+  </g>
+  <text x="148" y="573" fill="#FFDBFD" font-family="Inter, Arial" font-size="16" font-weight="800">01 Router</text>
+  <text x="148" y="627" fill="#FFDBFD" font-family="Inter, Arial" font-size="16" font-weight="800">02 Retriever</text>
+  <text x="148" y="681" fill="#FFDBFD" font-family="Inter, Arial" font-size="16" font-weight="800">03 Reasoner + Critic</text>
+
+  <rect x="540" y="42" width="654" height="242" rx="30" fill="#FFFFFF" opacity="0.78" filter="url(#shadow)" />
+  <text x="574" y="90" fill="#6D718F" font-family="Inter, Arial" font-size="13" font-weight="900" letter-spacing="3">KNOWLEDGE VAULT</text>
+  <text x="574" y="132" fill="#101226" font-family="Inter, Arial" font-size="30" font-weight="900">Load your source material</text>
+  <rect x="574" y="164" width="586" height="82" rx="22" fill="#F7F4FF" stroke="#C9BEFF" stroke-dasharray="5 4" />
+  <circle cx="620" cy="205" r="22" fill="#6367FF" />
+  <text x="614" y="213" fill="#FFFFFF" font-family="Inter, Arial" font-size="22" font-weight="900">+</text>
+  <text x="660" y="200" fill="#6367FF" font-family="Inter, Arial" font-size="16" font-weight="800">Choose or drop a document</text>
+  <text x="660" y="224" fill="#6D718F" font-family="Inter, Arial" font-size="13" font-weight="700">Chunked, embedded, and indexed locally.</text>
+
+  <rect x="540" y="308" width="654" height="410" rx="30" fill="#FFFFFF" opacity="0.84" filter="url(#shadow)" />
+  <text x="574" y="356" fill="#6D718F" font-family="Inter, Arial" font-size="13" font-weight="900" letter-spacing="3">AGENT WORKSPACE</text>
+  <text x="574" y="398" fill="#101226" font-family="Inter, Arial" font-size="30" font-weight="900">Chat with your documents</text>
+  <rect x="574" y="430" width="420" height="56" rx="22" fill="#F2F0FF" />
+  <text x="600" y="465" fill="#101226" font-family="Inter, Arial" font-size="16" font-weight="700">What are the key obligations?</text>
+  <rect x="720" y="510" width="420" height="70" rx="24" fill="url(#accent)" />
+  <text x="748" y="540" fill="#FFFFFF" font-family="Inter, Arial" font-size="16" font-weight="800">VaultMind found 3 relevant chunks and</text>
+  <text x="748" y="565" fill="#FFFFFF" font-family="Inter, Arial" font-size="16" font-weight="800">verified the answer with the critic agent.</text>
+  <rect x="574" y="620" width="586" height="58" rx="22" fill="#FFFFFF" stroke="#C9BEFF" />
+  <text x="598" y="655" fill="#6D718F" font-family="Inter, Arial" font-size="15">Ask another question...</text>
+</svg>
