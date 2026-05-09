@@ -1,4 +1,4 @@
-"""Vector store abstraction for FAISS and Pinecone."""
+"""Vector store abstraction for local semantic search."""
 
 import math
 
@@ -12,6 +12,11 @@ class InMemoryVectorStore:
     def __init__(self, embedder: Embedder | None = None) -> None:
         self.embedder = embedder or Embedder()
         self._items: list[EmbeddedChunk] = []
+
+    @property
+    def is_ready(self) -> bool:
+        """Return whether the store has vectors to search."""
+        return bool(self._items)
 
     def add(self, embedded_chunks: list[EmbeddedChunk]) -> None:
         """Store embedded chunks."""
@@ -33,6 +38,9 @@ class InMemoryVectorStore:
 
     def __len__(self) -> int:
         return len(self._items)
+
+
+VaultVectorStore = InMemoryVectorStore
 
 
 def cosine_similarity(left: list[float], right: list[float]) -> float:
