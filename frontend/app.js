@@ -1,6 +1,8 @@
 const healthStatus = document.querySelector("#healthStatus");
 const storeStatus = document.querySelector("#storeStatus");
 const providerStatus = document.querySelector("#providerStatus");
+const vectorCount = document.querySelector("#vectorCount");
+const sourceCount = document.querySelector("#sourceCount");
 const uploadForm = document.querySelector("#uploadForm");
 const documentInput = document.querySelector("#documentInput");
 const fileLabel = document.querySelector("#fileLabel");
@@ -28,10 +30,14 @@ async function refreshHealth() {
     healthStatus.textContent = health.status;
     storeStatus.textContent = health.vector_store_ready ? "Ready" : "Waiting";
     providerStatus.textContent = health.llm_provider;
+    vectorCount.textContent = health.vector_count ?? 0;
+    sourceCount.textContent = health.source_count ?? 0;
   } catch (error) {
     healthStatus.textContent = "Offline";
     storeStatus.textContent = "Unknown";
     providerStatus.textContent = "-";
+    vectorCount.textContent = "0";
+    sourceCount.textContent = "0";
   }
 }
 
