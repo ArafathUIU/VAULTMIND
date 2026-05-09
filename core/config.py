@@ -1,6 +1,6 @@
 # core/config.py
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from enum import Enum
 from functools import lru_cache
@@ -18,7 +18,18 @@ class VectorStoreType(str, Enum):
     PINECONE = "pinecone"
 
 
+class EmbeddingProvider(str, Enum):
+    OPENAI = "openai"
+    LOCAL = "local"
+
+
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
     # ── App ───────────────────────────────────────────────
     app_name: str = "VaultMind"
@@ -33,17 +44,22 @@ class Settings(BaseSettings):
 
     openai_api_key: str = Field(default="")
     openai_model: str = "gpt-4o"
+    openai_fast_model: str = "gpt-4o-mini"
 
     gemini_api_key: str = Field(default="")
     gemini_model: str = "gemini-1.5-pro"
+    gemini_fast_model: str = "gemini-1.5-flash"
 
     anthropic_api_key: str = Field(default="")
     anthropic_model: str = "claude-3-5-sonnet-20241022"
+    anthropic_fast_model: str = "claude-3-5-haiku-20241022"
 
     groq_api_key: str = Field(default="")
     groq_model: str = "llama-3.3-70b-versatile"
+    groq_fast_model: str = "llama-3.1-8b-instant"
 
     # ── Embeddings ────────────────────────────────────────
+    embedding_provider: EmbeddingProvider = EmbeddingProvider.OPENAI
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 
@@ -64,7 +80,7 @@ class Settings(BaseSettings):
     # ── API ───────────────────────────────────────────────
     api_host: str = "0.0.0.0"
     api_port: int = 8000
-    allowed_origins: list[str] = ["*"]
+    allowed_origins: list[str] = Field(default_factory=lambda: ["*"])
     max_upload_size_mb: int = 50
 
     # ── Observability ─────────────────────────────────────
@@ -74,11 +90,6 @@ class Settings(BaseSettings):
 
     # ── Evaluation ────────────────────────────────────────
     eval_sample_size: int = 20
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
 
 
 @lru_cache()

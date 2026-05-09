@@ -11,4 +11,6 @@ langchain-anthropic
 langchain-groq
 faiss-cpu
 pinecone
+pypdf
+python-docx
 pytest
