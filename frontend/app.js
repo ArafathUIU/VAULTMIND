@@ -366,8 +366,8 @@ function idleMessage(agent) {
   const messages = {
     router: "Waiting to classify the next question.",
     retriever: "Waiting to search the vault.",
-    reasoning: "Waiting to draft the grounded answer.",
-    critic: "Waiting to verify the answer.",
+    reasoning: "Waiting to synthesize the evidence.",
+    critic: "Waiting to verify answer quality.",
   };
   return messages[agent] || "Waiting for the next task.";
 }
