@@ -46,7 +46,9 @@ for retrieving relevant chunks from a vector database.
 
 Rules:
 - Return ONLY the reformulated search query. Nothing else.
-- Make the query specific, keyword-rich, and focused.
+- Make the query specific, keyword-rich, and broad enough to recover all likely evidence.
+- Preserve key names, dates, obligations, constraints, product names, section names, and domain terms.
+- Add close synonyms only when they improve recall.
 - Remove filler words, greetings, and conversational language.
 - If the query is already well-formed, return it as-is.
 
@@ -80,11 +82,15 @@ Your job is to generate a clear, accurate answer grounded strictly in the provid
 
 Rules:
 - ONLY use information from the provided context. Never use prior knowledge.
-- Always cite your sources using [Source: filename, Page: N] inline.
+- Start with a direct answer to the user's question.
+- Then give the supporting details as concise bullets when there are multiple points.
+- Always cite every substantive claim using [Source: filename, Page: N] when a page is available, otherwise [Source: filename].
+- Synthesize across chunks instead of repeating raw excerpts.
+- If the context contains partial evidence, answer the supported part and clearly say what is not specified.
 - If the context does not contain enough information to answer, say:
   "The uploaded documents do not contain enough information to answer this question."
-- Be concise. Do not pad your answer with unnecessary text.
-- Use bullet points for lists. Use plain prose for explanations.
+- Be complete before being brief. Do not omit key conditions, exceptions, dates, amounts, actors, or obligations that answer the question.
+- Do not pad your answer with generic text.
 - Never speculate or make assumptions beyond what the documents say.
 
 Context:
@@ -128,6 +134,8 @@ Respond in this exact JSON format:
 Rules:
 - verdict is PASS only if ALL three checks are true.
 - If verdict is FAIL, always provide a revised_answer.
+- The revised_answer must be directly useful to the user, complete, and cited from the context.
+- Keep supported partial answers instead of replacing them with a generic refusal.
 - Be strict. A single unsupported claim = faithfulness: false.
 - Respond with valid JSON only. No extra text.
 

@@ -23,12 +23,13 @@ class FakePipelineResult:
 
 
 class FakeOrchestrator:
-    def run(self, query: str) -> FakePipelineResult:
+    def run(self, query: str, top_k: int = 8) -> FakePipelineResult:
         result = FakePipelineResult()
         result.query = query
+        result.chunk_count = top_k
         return result
 
-    def run_with_events(self, query: str):
+    def run_with_events(self, query: str, top_k: int = 8):
         yield AgentStreamEvent(
             type="agent",
             agent="router",
@@ -46,7 +47,7 @@ class FakeOrchestrator:
                 "verdict": "PASS",
                 "was_revised": False,
                 "reformulated_query": "leave policy",
-                "chunk_count": 1,
+                "chunk_count": top_k,
                 "agent_logs": [{"agent": "fake"}],
                 "success": True,
                 "error": None,
@@ -140,6 +141,7 @@ def test_query_endpoint_returns_orchestrator_result() -> None:
     assert payload["final_answer"] == "Employees receive annual leave."
     assert payload["verdict"] == "PASS"
     assert payload["agent_logs"] == [{"agent": "fake"}]
+    assert payload["chunk_count"] == 8
 
 
 def test_stream_query_endpoint_returns_agent_events() -> None:
@@ -147,7 +149,7 @@ def test_stream_query_endpoint_returns_agent_events() -> None:
     client = TestClient(app)
 
     try:
-        response = client.post("/query/stream", json={"query": "What is the leave policy?"})
+        response = client.post("/query/stream", json={"query": "What is the leave policy?", "top_k": 12})
     finally:
         app.dependency_overrides.clear()
 
@@ -159,6 +161,7 @@ def test_stream_query_endpoint_returns_agent_events() -> None:
     assert '"agent": "router"' in lines[0]
     assert '"type": "final"' in lines[-1]
     assert '"final_answer": "Employees receive annual leave."' in lines[-1]
+    assert '"chunk_count": 12' in lines[-1]
 
 
 def test_query_request_rejects_empty_query() -> None:

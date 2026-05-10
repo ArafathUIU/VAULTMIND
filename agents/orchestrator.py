@@ -27,6 +27,7 @@ class PipelineState(TypedDict):
     """
     # input
     query: str
+    top_k: int
 
     # router output
     route: str | None
@@ -112,7 +113,7 @@ class VaultOrchestrator:
     # PUBLIC
     # ─────────────────────────────────────────
 
-    def run(self, query: str) -> PipelineResult:
+    def run(self, query: str, top_k: int = 8) -> PipelineResult:
         """
         Run the full pipeline for a user query.
         Returns a PipelineResult — always, even on failure.
@@ -121,6 +122,7 @@ class VaultOrchestrator:
 
         initial_state: PipelineState = {
             "query": query,
+            "top_k": top_k,
             "route": None,
             "context": None,
             "chunks": None,
@@ -146,7 +148,7 @@ class VaultOrchestrator:
                 success=False,
             )
 
-    def run_with_events(self, query: str):
+    def run_with_events(self, query: str, top_k: int = 8):
         """
         Run the pipeline and yield progress events before returning the final answer.
 
@@ -157,6 +159,7 @@ class VaultOrchestrator:
 
         state: PipelineState = {
             "query": query,
+            "top_k": top_k,
             "route": None,
             "context": None,
             "chunks": None,
@@ -261,7 +264,7 @@ class VaultOrchestrator:
         return {"route": result.output, "agent_logs": [log]}
 
     def _node_retriever(self, state: PipelineState) -> dict:
-        result = self.retriever.timed_run(query=state["query"])
+        result = self.retriever.timed_run(query=state["query"], top_k=state.get("top_k", 8))
 
         log = {
             "agent": "retriever",

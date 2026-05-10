@@ -21,7 +21,7 @@ class RetrieverAgent(BaseAgent):
         )
         self.vector_store = vector_store
 
-    def run(self, query: str, top_k: int = 5) -> AgentResult:
+    def run(self, query: str, top_k: int = 8) -> AgentResult:
 
         if len(self.vector_store) == 0:
             return self.fail(

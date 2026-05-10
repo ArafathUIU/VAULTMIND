@@ -19,7 +19,7 @@ def query_documents(
 ) -> QueryResponse:
     """Run a user query through the multi-agent document pipeline."""
     try:
-        result = orchestrator.run(request.query)
+        result = orchestrator.run(request.query, top_k=request.top_k)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -48,7 +48,7 @@ def stream_query_documents(
 
     def event_stream():
         try:
-            for event in orchestrator.run_with_events(request.query):
+            for event in orchestrator.run_with_events(request.query, top_k=request.top_k):
                 yield json.dumps(_event_payload(event)) + "\n"
         except ValueError as exc:
             payload = {
