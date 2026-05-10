@@ -66,3 +66,26 @@ def test_critic_parses_json_verdict() -> None:
     assert verdict.completeness is False
     assert verdict.verdict == "FAIL"
     assert verdict.revised_answer == "Corrected answer."
+
+
+def test_critic_extracts_json_from_extra_text() -> None:
+    raw = """
+    Here is the quality check:
+    {
+      "faithfulness": true,
+      "relevance": true,
+      "completeness": true,
+      "issues": null,
+      "verdict": "pass",
+      "revised_answer": null
+    }
+    Hope this helps.
+    """
+
+    verdict = CriticAgent._parse_verdict(None, raw)
+
+    assert verdict.faithfulness is True
+    assert verdict.relevance is True
+    assert verdict.completeness is True
+    assert verdict.verdict == "PASS"
+    assert verdict.revised_answer is None

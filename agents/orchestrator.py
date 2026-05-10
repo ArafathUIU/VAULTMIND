@@ -501,6 +501,8 @@ class VaultOrchestrator:
 
     def _critic_message(self, state: PipelineState) -> str:
         verdict = state.get("verdict") or "REVIEWED"
+        if verdict == "PARSE_ERROR":
+            return "The critic could not parse its quality report, so I kept the drafted answer unchanged."
         if state.get("was_revised"):
             return f"Verdict: {verdict}. I revised the answer before sending it to you."
         return f"Verdict: {verdict}. The answer is ready for delivery."

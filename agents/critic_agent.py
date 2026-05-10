@@ -1,6 +1,7 @@
 # agents/critic_agent.py
 
 import json
+import re
 
 from agents.base_agent import BaseAgent, AgentResult
 from core.llm_factory import get_critic_llm
@@ -81,15 +82,27 @@ class CriticAgent(BaseAgent):
         )
 
     def _parse_verdict(self, raw: str) -> CriticVerdict:
-        # strip any accidental markdown code fences
-        clean = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-        data = json.loads(clean)
+        data = json.loads(CriticAgent._extract_json_object(raw))
 
         return CriticVerdict(
-            faithfulness=data["faithfulness"],
-            relevance=data["relevance"],
-            completeness=data["completeness"],
+            faithfulness=bool(data["faithfulness"]),
+            relevance=bool(data["relevance"]),
+            completeness=bool(data["completeness"]),
             issues=data.get("issues"),
-            verdict=data["verdict"],
+            verdict=str(data["verdict"]).upper(),
             revised_answer=data.get("revised_answer"),
         )
+
+    @staticmethod
+    def _extract_json_object(raw: str) -> str:
+        clean = raw.strip()
+        fence_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", clean, re.DOTALL | re.IGNORECASE)
+        if fence_match:
+            return fence_match.group(1).strip()
+
+        start = clean.find("{")
+        end = clean.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            raise ValueError("Critic response did not contain a JSON object.")
+
+        return clean[start : end + 1]
