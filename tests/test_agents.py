@@ -1,6 +1,8 @@
 """Tests for agent behavior."""
 
 from agents.critic_agent import CriticAgent
+from agents.base_agent import AgentResult
+from agents.orchestrator import VaultOrchestrator
 from agents.retriever_agent import RetrieverAgent
 from agents.router_agent import RouteLabel
 from ingestion.models import DocumentChunk, SearchResult
@@ -104,3 +106,30 @@ def test_critic_parses_python_style_verdict() -> None:
     assert verdict.completeness is False
     assert verdict.verdict == "FAIL"
     assert verdict.revised_answer == "Revised."
+
+
+def test_orchestrator_preserves_answer_when_critic_fails() -> None:
+    class FailingCritic:
+        def timed_run(self, **kwargs) -> AgentResult:
+            return AgentResult(
+                agent_name="critic",
+                success=False,
+                output=None,
+                error="critic failed",
+                latency_ms=1.0,
+            )
+
+    orchestrator = VaultOrchestrator.__new__(VaultOrchestrator)
+    orchestrator.critic = FailingCritic()
+
+    update = orchestrator._node_critic(
+        {
+            "query": "q",
+            "answer": "Draft answer with citations.",
+            "context": "context",
+        }
+    )
+
+    assert update["final_answer"] == "Draft answer with citations."
+    assert update["verdict"] == "REVIEWED"
+    assert update["agent_logs"][0]["fallback"] is True

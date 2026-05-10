@@ -331,6 +331,16 @@ class VaultOrchestrator:
             "was_revised": result.metadata.get("was_revised", False),
         }
 
+        if result.failed or not result.output:
+            log["verdict"] = "REVIEWED"
+            log["fallback"] = True
+            return {
+                "final_answer": state["answer"],
+                "verdict": "REVIEWED",
+                "was_revised": False,
+                "agent_logs": [log],
+            }
+
         return {
             "final_answer": result.output,
             "verdict": result.metadata.get("verdict"),
