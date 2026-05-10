@@ -69,6 +69,17 @@ class PipelineResult:
     success: bool = True
 
 
+@dataclass
+class AgentStreamEvent:
+    """Structured progress event streamed to the browser while agents run."""
+    type: str
+    agent: str
+    message: str
+    status: str
+    latency_ms: float | None = None
+    metadata: dict = field(default_factory=dict)
+
+
 # ─────────────────────────────────────────────
 # ORCHESTRATOR
 # ─────────────────────────────────────────────
@@ -133,6 +144,106 @@ class VaultOrchestrator:
                 final_answer="Something went wrong while processing your query. Please try again.",
                 error=str(e),
                 success=False,
+            )
+
+    def run_with_events(self, query: str):
+        """
+        Run the pipeline and yield progress events before returning the final answer.
+
+        This intentionally mirrors the graph flow so the frontend can show the agents
+        collaborating in real time without changing the existing non-streaming API.
+        """
+        logger.info(f"Streaming pipeline starting — query: '{query[:80]}...'")
+
+        state: PipelineState = {
+            "query": query,
+            "route": None,
+            "context": None,
+            "chunks": None,
+            "reformulated_query": None,
+            "answer": None,
+            "final_answer": None,
+            "verdict": None,
+            "was_revised": False,
+            "error": None,
+            "agent_logs": [],
+        }
+
+        try:
+            yield self._event("started", "router", "I am deciding which specialist should handle this question.")
+            update = self._node_router(state)
+            self._merge_state(state, update)
+            route = state.get("route") or RouteLabel.OUT_OF_SCOPE
+            yield self._event(
+                "finished",
+                "router",
+                self._router_message(route),
+                self._latest_latency(update),
+                {"route": route},
+            )
+
+            next_node = self._route_after_router(state)
+            if next_node == "retriever":
+                yield self._event("started", "retriever", "I am searching the indexed documents for the strongest evidence.")
+                update = self._node_retriever(state)
+                self._merge_state(state, update)
+                yield self._event(
+                    "finished",
+                    "retriever",
+                    self._retriever_message(state),
+                    self._latest_latency(update),
+                    {
+                        "chunk_count": len(state.get("chunks") or []),
+                        "reformulated_query": state.get("reformulated_query"),
+                    },
+                )
+
+                yield self._event("started", "reasoning", "I am building an answer from the retrieved context.")
+                update = self._node_reasoning(state)
+                self._merge_state(state, update)
+                yield self._event(
+                    "finished",
+                    "reasoning",
+                    "I drafted the answer and passed it to the critic for verification.",
+                    self._latest_latency(update),
+                )
+
+                yield self._event("started", "critic", "I am checking the answer for faithfulness, relevance, and completeness.")
+                update = self._node_critic(state)
+                self._merge_state(state, update)
+                yield self._event(
+                    "finished",
+                    "critic",
+                    self._critic_message(state),
+                    self._latest_latency(update),
+                    {
+                        "verdict": state.get("verdict"),
+                        "was_revised": state.get("was_revised", False),
+                    },
+                )
+            elif next_node == "conversational":
+                yield self._event("started", "conversational", "I am answering directly because this does not need document retrieval.")
+                update = self._node_conversational(state)
+                self._merge_state(state, update)
+                yield self._event("finished", "conversational", "I prepared a direct conversational response.")
+            else:
+                yield self._event("started", "scope", "I am checking whether this question belongs to the uploaded documents.")
+                update = self._node_out_of_scope(state)
+                self._merge_state(state, update)
+                yield self._event("finished", "scope", "This question appears outside the uploaded document scope.")
+
+            result = self._build_result(state)
+            yield self._final_event(result)
+
+        except Exception as e:
+            logger.exception(f"Streaming pipeline crashed: {e}")
+            yield self._final_event(
+                PipelineResult(
+                    query=query,
+                    final_answer="Something went wrong while processing your query. Please try again.",
+                    error=str(e),
+                    success=False,
+                )
             )
 
     # ─────────────────────────────────────────
@@ -322,3 +433,71 @@ class VaultOrchestrator:
             error=state.get("error"),
             success=state.get("error") is None,
         )
+
+    def _event(
+        self,
+        status: str,
+        agent: str,
+        message: str,
+        latency_ms: float | None = None,
+        metadata: dict | None = None,
+    ) -> AgentStreamEvent:
+        return AgentStreamEvent(
+            type="agent",
+            agent=agent,
+            message=message,
+            status=status,
+            latency_ms=latency_ms,
+            metadata=metadata or {},
+        )
+
+    def _final_event(self, result: PipelineResult) -> AgentStreamEvent:
+        return AgentStreamEvent(
+            type="final",
+            agent="vaultmind",
+            message=result.final_answer,
+            status="finished",
+            metadata={
+                "query": result.query,
+                "final_answer": result.final_answer,
+                "verdict": result.verdict,
+                "was_revised": result.was_revised,
+                "reformulated_query": result.reformulated_query,
+                "chunk_count": result.chunk_count,
+                "agent_logs": result.agent_logs,
+                "success": result.success,
+                "error": result.error,
+            },
+        )
+
+    def _merge_state(self, state: PipelineState, update: dict) -> None:
+        for key, value in update.items():
+            if key == "agent_logs":
+                state["agent_logs"].extend(value)
+            else:
+                state[key] = value
+
+    def _latest_latency(self, update: dict) -> float | None:
+        logs = update.get("agent_logs") or []
+        if not logs:
+            return None
+        return logs[-1].get("latency_ms")
+
+    def _router_message(self, route: str) -> str:
+        if route == RouteLabel.RETRIEVAL:
+            return "This needs document evidence, so I am sending it to the retriever."
+        if route == RouteLabel.CONVERSATIONAL:
+            return "This is conversational, so I can answer without searching documents."
+        return "This looks outside the uploaded document scope."
+
+    def _retriever_message(self, state: PipelineState) -> str:
+        chunk_count = len(state.get("chunks") or [])
+        if chunk_count:
+            return f"I found {chunk_count} relevant chunk(s) and prepared the context for reasoning."
+        return "I could not find enough matching document context for this question."
+
+    def _critic_message(self, state: PipelineState) -> str:
+        verdict = state.get("verdict") or "REVIEWED"
+        if state.get("was_revised"):
+            return f"Verdict: {verdict}. I revised the answer before sending it to you."
+        return f"Verdict: {verdict}. The answer is ready for delivery."

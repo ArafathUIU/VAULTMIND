@@ -1,8 +1,11 @@
 """Document query endpoint."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
 
-from agents.orchestrator import VaultOrchestrator
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
+
+from agents.orchestrator import AgentStreamEvent, VaultOrchestrator
 from api.dependencies import get_orchestrator
 from api.schemas import QueryRequest, QueryResponse
 
@@ -34,3 +37,38 @@ def query_documents(
         success=result.success,
         error=result.error,
     )
+
+
+@router.post("/stream")
+def stream_query_documents(
+    request: QueryRequest,
+    orchestrator: VaultOrchestrator = Depends(get_orchestrator),
+) -> StreamingResponse:
+    """Stream multi-agent progress events and the final answer as NDJSON."""
+
+    def event_stream():
+        try:
+            for event in orchestrator.run_with_events(request.query):
+                yield json.dumps(_event_payload(event)) + "\n"
+        except ValueError as exc:
+            payload = {
+                "type": "final",
+                "agent": "vaultmind",
+                "status": "error",
+                "message": str(exc),
+                "metadata": {"success": False, "error": str(exc)},
+            }
+            yield json.dumps(payload) + "\n"
+
+    return StreamingResponse(event_stream(), media_type="application/x-ndjson")
+
+
+def _event_payload(event: AgentStreamEvent) -> dict:
+    return {
+        "type": event.type,
+        "agent": event.agent,
+        "message": event.message,
+        "status": event.status,
+        "latency_ms": event.latency_ms,
+        "metadata": event.metadata,
+    }

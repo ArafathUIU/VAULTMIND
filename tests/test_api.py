@@ -3,6 +3,7 @@
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
+from agents.orchestrator import AgentStreamEvent
 from api.dependencies import get_orchestrator, get_vector_store
 from api.main import app
 from api.schemas import QueryRequest, QueryResponse
@@ -26,6 +27,31 @@ class FakeOrchestrator:
         result = FakePipelineResult()
         result.query = query
         return result
+
+    def run_with_events(self, query: str):
+        yield AgentStreamEvent(
+            type="agent",
+            agent="router",
+            status="started",
+            message="Routing the question.",
+        )
+        yield AgentStreamEvent(
+            type="final",
+            agent="vaultmind",
+            status="finished",
+            message="Employees receive annual leave.",
+            metadata={
+                "query": query,
+                "final_answer": "Employees receive annual leave.",
+                "verdict": "PASS",
+                "was_revised": False,
+                "reformulated_query": "leave policy",
+                "chunk_count": 1,
+                "agent_logs": [{"agent": "fake"}],
+                "success": True,
+                "error": None,
+            },
+        )
 
 
 def test_api_modules_import() -> None:
@@ -114,6 +140,25 @@ def test_query_endpoint_returns_orchestrator_result() -> None:
     assert payload["final_answer"] == "Employees receive annual leave."
     assert payload["verdict"] == "PASS"
     assert payload["agent_logs"] == [{"agent": "fake"}]
+
+
+def test_stream_query_endpoint_returns_agent_events() -> None:
+    app.dependency_overrides[get_orchestrator] = lambda: FakeOrchestrator()
+    client = TestClient(app)
+
+    try:
+        response = client.post("/query/stream", json={"query": "What is the leave policy?"})
+    finally:
+        app.dependency_overrides.clear()
+
+    lines = [line for line in response.text.splitlines() if line]
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/x-ndjson")
+    assert '"type": "agent"' in lines[0]
+    assert '"agent": "router"' in lines[0]
+    assert '"type": "final"' in lines[-1]
+    assert '"final_answer": "Employees receive annual leave."' in lines[-1]
 
 
 def test_query_request_rejects_empty_query() -> None:

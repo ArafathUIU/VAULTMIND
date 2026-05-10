@@ -122,6 +122,42 @@
               </div>
             </dl>
           </article>
+          <section class="agent-council-card" aria-live="polite">
+            <div class="trace-heading">
+              <span>Agent Council</span>
+              <small>Live collaboration</small>
+            </div>
+            <div id="agentCouncilOutput" class="agent-council-output">
+              <article class="agent-card idle" data-agent="router">
+                <span class="agent-orb">R</span>
+                <div>
+                  <strong>Router</strong>
+                  <p>Waiting to classify the next question.</p>
+                </div>
+              </article>
+              <article class="agent-card idle" data-agent="retriever">
+                <span class="agent-orb">Re</span>
+                <div>
+                  <strong>Retriever</strong>
+                  <p>Waiting to search the vault.</p>
+                </div>
+              </article>
+              <article class="agent-card idle" data-agent="reasoning">
+                <span class="agent-orb">A</span>
+                <div>
+                  <strong>Reasoner</strong>
+                  <p>Waiting to draft the grounded answer.</p>
+                </div>
+              </article>
+              <article class="agent-card idle" data-agent="critic">
+                <span class="agent-orb">C</span>
+                <div>
+                  <strong>Critic</strong>
+                  <p>Waiting to verify the answer.</p>
+                </div>
+              </article>
+            </div>
+          </section>
           <section class="trace-card">
             <div class="trace-heading">
               <span>Agent trace</span>

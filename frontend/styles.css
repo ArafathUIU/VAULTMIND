@@ -212,6 +212,7 @@ h2 {
 
 .status-grid article,
 .card,
+.agent-council-card,
 .trace-card {
   border: 1px solid rgba(255, 255, 255, 0.72);
   background: var(--panel);
@@ -248,6 +249,7 @@ h2 {
 }
 
 .card,
+.agent-council-card,
 .trace-card {
   padding: clamp(1.2rem, 3vw, 2rem);
   border-radius: 1.7rem;
@@ -580,6 +582,111 @@ textarea {
   padding: 1rem;
 }
 
+.agent-council-card {
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(16, 18, 38, 0.92), rgba(37, 40, 74, 0.86)),
+    var(--ink);
+  box-shadow: 0 18px 70px rgba(16, 18, 38, 0.2);
+}
+
+.agent-council-card .trace-heading {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.agent-council-card .trace-heading small {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.agent-council-output {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.agent-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.72rem;
+  min-height: 8.8rem;
+  overflow: hidden;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 1.1rem;
+  color: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 255, 255, 0.06);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.agent-card::after {
+  position: absolute;
+  inset: auto -28% -48% 28%;
+  height: 5rem;
+  content: "";
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(132, 148, 255, 0.28), transparent 68%);
+}
+
+.agent-card.active {
+  transform: translateY(-2px);
+  border-color: rgba(255, 219, 253, 0.58);
+  background: linear-gradient(145deg, rgba(99, 103, 255, 0.3), rgba(255, 219, 253, 0.1));
+  box-shadow: 0 16px 34px rgba(99, 103, 255, 0.2);
+}
+
+.agent-card.complete {
+  border-color: rgba(54, 179, 126, 0.34);
+  background: rgba(54, 179, 126, 0.1);
+}
+
+.agent-card.error {
+  border-color: rgba(214, 69, 114, 0.5);
+  background: rgba(214, 69, 114, 0.14);
+}
+
+.agent-orb {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border-radius: 0.9rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--blue-soft));
+  font-size: 0.72rem;
+  font-weight: 900;
+  box-shadow: 0 0 0 4px rgba(99, 103, 255, 0.12);
+}
+
+.agent-card strong,
+.agent-card p,
+.agent-card small {
+  position: relative;
+  z-index: 1;
+}
+
+.agent-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #fff;
+  font-size: 0.86rem;
+}
+
+.agent-card p {
+  margin: 0 0 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.agent-card small {
+  color: var(--pink);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
 .trace-heading {
   margin-bottom: 0.8rem;
   color: var(--ink-soft);
@@ -632,6 +739,10 @@ textarea {
     min-height: auto;
     gap: 2rem;
   }
+
+  .agent-council-output {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 560px) {
@@ -646,5 +757,9 @@ textarea {
 
   .action-row button {
     width: 100%;
+  }
+
+  .agent-council-output {
+    grid-template-columns: 1fr;
   }
 }
