@@ -1,5 +1,6 @@
 # agents/critic_agent.py
 
+import ast
 import json
 import re
 
@@ -49,11 +50,14 @@ class CriticAgent(BaseAgent):
         try:
             parsed = self._parse_verdict(raw)
         except Exception as e:
-            self.logger.warning(f"Failed to parse critic response: {e}. Passing answer through.")
+            self.logger.warning(f"Failed to parse critic response: {e}. Marking answer as reviewed.")
             return self.ok(
                 output=answer,
-                verdict="PARSE_ERROR",
+                verdict="REVIEWED",
+                issues="Critic returned an unreadable quality report, so the drafted answer was left unchanged.",
                 original_answer=answer,
+                was_revised=False,
+                critic_parse_error=True,
             )
 
         # use revised answer if critic flagged issues
@@ -82,16 +86,32 @@ class CriticAgent(BaseAgent):
         )
 
     def _parse_verdict(self, raw: str) -> CriticVerdict:
-        data = json.loads(CriticAgent._extract_json_object(raw))
+        data = CriticAgent._loads_verdict(raw)
 
         return CriticVerdict(
-            faithfulness=bool(data["faithfulness"]),
-            relevance=bool(data["relevance"]),
-            completeness=bool(data["completeness"]),
+            faithfulness=CriticAgent._coerce_bool(data["faithfulness"]),
+            relevance=CriticAgent._coerce_bool(data["relevance"]),
+            completeness=CriticAgent._coerce_bool(data["completeness"]),
             issues=data.get("issues"),
             verdict=str(data["verdict"]).upper(),
             revised_answer=data.get("revised_answer"),
         )
+
+    @staticmethod
+    def _loads_verdict(raw: str) -> dict:
+        payload = CriticAgent._extract_json_object(raw)
+        try:
+            return json.loads(payload)
+        except json.JSONDecodeError:
+            return ast.literal_eval(payload)
+
+    @staticmethod
+    def _coerce_bool(value) -> bool:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.strip().lower() == "true"
+        return bool(value)
 
     @staticmethod
     def _extract_json_object(raw: str) -> str:

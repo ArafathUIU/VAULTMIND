@@ -131,6 +131,11 @@ Respond in this exact JSON format:
   "revised_answer": "corrected answer if verdict is FAIL, otherwise null"
 }}
 
+Output rules:
+- Return one raw JSON object only.
+- Do not wrap the JSON in markdown fences.
+- The first character must be { and the last character must be }.
+
 Rules:
 - verdict is PASS only if ALL three checks are true.
 - If verdict is FAIL, always provide a revised_answer.

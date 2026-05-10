@@ -89,3 +89,18 @@ def test_critic_extracts_json_from_extra_text() -> None:
     assert verdict.completeness is True
     assert verdict.verdict == "PASS"
     assert verdict.revised_answer is None
+
+
+def test_critic_parses_python_style_verdict() -> None:
+    raw = """
+    {'faithfulness': 'false', 'relevance': 'true', 'completeness': False,
+     'issues': 'Unsupported claim.', 'verdict': 'fail', 'revised_answer': 'Revised.'}
+    """
+
+    verdict = CriticAgent._parse_verdict(None, raw)
+
+    assert verdict.faithfulness is False
+    assert verdict.relevance is True
+    assert verdict.completeness is False
+    assert verdict.verdict == "FAIL"
+    assert verdict.revised_answer == "Revised."
